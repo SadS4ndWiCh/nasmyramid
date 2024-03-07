@@ -5,13 +5,15 @@ _start:
     xor r8, r8                  ; r8 = 0
     xor r10, r10                ; r10 = 0
 
-    .loop:                      ; while (r8 != 10) {
+    .loop:                      ; while (r8 < 10) {
         cmp r8, 10              ;
-        je .endloop             ; 
+        jae .endloop            ;   // Jump if r8 is above or equal (jae) to 10
+                                ;   // that means to loop while r8 ins't above
+                                ;   // or equal 10
                                 ;
-        .innerloop:             ;   while (r10 != r8) {
+        .innerloop:             ;   while (r10 < r8) {
             cmp r10, r8         ;       
-            je .endinnerloop    ;
+            jae .endinnerloop   ;
                                 ;
             mov rdi, star       ;       rdi = "* "
             call print          ;       print(rdi)
@@ -30,14 +32,16 @@ _start:
         jmp .loop               ;
     .endloop:                   ; }
 
-    jmp exit                    ; exit()
+    xor rdi, rdi                ; rdi = 0
+    call exit                   ; exit(rdi)
 
 ;-------------------------
-; str_len(char*)
+; str_len(char* buf)
 ; > Get the string length 
 ;
-; @param {char*} RDI
-; @returns {int} RAX
+; @param {char* buf} RDI, The string buffer
+;
+; @returns {int} RAX, The string length
 ;-------------------------
 str_len:
     xor rax, rax                ; rax = 0
@@ -52,12 +56,11 @@ str_len:
 
     ret                         ; return rax
 
-
 ;-------------------------
-; print(char*)
+; print(char* buf)
 ; > Write to console
 ;
-; @param {char*} RDI
+; @param {char*} RDI, The string buffer
 ;-------------------------
 print:
     call str_len
@@ -69,10 +72,14 @@ print:
 
     ret
 
-
+;-------------------------
+; exit(uint code)
+; > Exit the program
+;
+; @param {uint code} RDI, The exit code
+;-------------------------
 exit:
     mov rax, 60
-    mov rdi, 0
     syscall
 
 section .data
